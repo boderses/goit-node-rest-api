@@ -1,10 +1,24 @@
+require('dotenv').config();
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const contactsRouter = require("./routes/contactsRouter.js");
 
+
+
 const app = express();
+
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log("Database connection successful");
+  })
+  .catch((err) => {
+    console.log(err);
+    process.exit(1);
+  });
 
 app.use(morgan("tiny"));
 app.use(cors());
