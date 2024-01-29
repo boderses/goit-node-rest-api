@@ -12,4 +12,8 @@ const updateContactSchema = Joi.object({
   phone: Joi.string(),
 });
 
-module.exports = { createContactSchema, updateContactSchema };
+const updateContactStateSchema = Joi.object({
+  favorite: Joi.boolean(),
+});
+
+module.exports = { createContactSchema, updateContactSchema, updateContactStateSchema };
