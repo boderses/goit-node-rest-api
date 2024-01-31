@@ -36,7 +36,7 @@ const updateContactState = async (req, res) => {
   const contact = await contactsService.updateContact(id, req.body);
   console.log(req.body.favorite);
   if (favorite === undefined) {
-    throw HttpError(404, "Not Found");
+    throw HttpError(400, "Field favorite is required");
   }
   res.status(200).json(contact);
 };
