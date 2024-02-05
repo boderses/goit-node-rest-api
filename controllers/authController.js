@@ -2,7 +2,7 @@ require("dotenv").config();
 const { catchAsync, HttpError } = require("../helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const User = require("../schemas/userSchema.js");
+const { User } = require("../schemas/userSchema.js");
 
 const { SECRET_KEY } = process.env;
 
