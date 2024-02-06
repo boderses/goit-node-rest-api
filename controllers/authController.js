@@ -2,7 +2,7 @@ require("dotenv").config();
 const { catchAsync, HttpError } = require("../helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User } = require("../schemas/userSchema.js");
+const { User } = require("../schemas/usersSchemas.js");
 
 const { SECRET_KEY } = process.env;
 
@@ -43,7 +43,7 @@ const login = async (req, res) => {
 
   const payload = { id: user._id };
 
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "24h" });
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "3h" });
   await User.findByIdAndUpdate(user._id, { token });
 
   res.status(200).json({
