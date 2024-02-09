@@ -14,19 +14,21 @@ const {
   validateBody,
   idValidator,
   contactWithoutId,
+  checkAuthData,
 } = require("../middlewares");
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", getAllContacts);
+contactsRouter.get("/", checkAuthData, getAllContacts);
 
-contactsRouter.get("/:id", idValidator, contactWithoutId, getOneContact);
+contactsRouter.get("/:id", idValidator, contactWithoutId, checkAuthData, getOneContact);
 
-contactsRouter.delete("/:id", idValidator, contactWithoutId, deleteContact);
+contactsRouter.delete("/:id", idValidator, contactWithoutId, checkAuthData, deleteContact);
 
 contactsRouter.post(
   "/",
   validateBody(schemas.createContactSchema),
+  checkAuthData,
   createContact
 );
 
@@ -35,6 +37,7 @@ contactsRouter.put(
   idValidator,
   contactWithoutId,
   validateBody(schemas.updateContactSchema),
+  // checkAuthData,
   updateContact
 );
 
@@ -43,6 +46,7 @@ contactsRouter.patch(
   idValidator,
   contactWithoutId,
   validateBody(schemas.updateContactStateSchema),
+  checkAuthData,
   updateContactState
 );
 

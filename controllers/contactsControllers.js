@@ -26,6 +26,9 @@ const createContact = async (req, res) => {
 
 const updateContact = async (req, res) => {
   const { id } = req.params;
+  if (Object.keys(req.body).length === 0) {
+    throw HttpError(400, "Missing fields");
+  }
   const updContact = await contactsService.updateContact(id, req.body);
   res.status(200).json(updContact);
 };
@@ -33,11 +36,10 @@ const updateContact = async (req, res) => {
 const updateContactState = async (req, res) => {
   const { id } = req.params;
   const { favorite } = req.body;
-  const contact = await contactsService.updateContact(id, req.body);
-  console.log(req.body.favorite);
   if (favorite === undefined) {
     throw HttpError(400, "Field favorite is required");
   }
+  const contact = await contactsService.updateContact(id, req.body);
   res.status(200).json(contact);
 };
 
