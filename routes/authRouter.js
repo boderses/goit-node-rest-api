@@ -9,5 +9,6 @@ authRouter.post("/register", validateBody(userActionsSchema.registerSchema), use
 authRouter.post("/login",validateBody(userActionsSchema.loginSchema), userController.login);
 authRouter.get("/current", checkAuthData, userController.currentUser);
 authRouter.post("/logout", checkAuthData, userController.logout);
+authRouter.patch("/avatars", checkAuthData, userController.updateAvatar);
 
 module.exports = authRouter;

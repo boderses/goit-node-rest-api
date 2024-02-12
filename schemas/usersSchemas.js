@@ -18,14 +18,15 @@ const userSchema = new Schema(
       default: "starter",
     },
     token: String,
+    avatarURL: String,
   },
   { versionKey: false }
 );
 
 const registerSchema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(6).required(),
-  });
+  email: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+});
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),

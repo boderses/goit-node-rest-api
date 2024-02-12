@@ -1,10 +1,18 @@
 require("dotenv").config();
-const { catchAsync, HttpError } = require("../helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const path = require("path");
+const fs = require("fs/promises");
+const gravatar = require("gravatar");
+const Jimp = require("jimp");
+
 const { User } = require("../schemas/usersSchemas.js");
+const { catchAsync, HttpError } = require("../helpers");
 
 const { SECRET_KEY } = process.env;
+
+const avatarsPath = path.join(__dirname, "../", "public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -14,9 +22,15 @@ const register = async (req, res) => {
   if (user) {
     throw HttpError(409, "Email in use");
   }
-  const hashPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedEmail = crypto.createHash("md5").update(email).digest("hex");
+  const avatarLink = gravatar.url(hashedEmail);
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashedPassword,
+    avatarLink,
+  });
 
   res.status(201).json({
     user: {
@@ -72,9 +86,31 @@ const logout = async (req, res) => {
   });
 };
 
+const updateAvatar = async (req, res) => {
+  if (!req.file) {
+    throw HttpError(401, "Not authorized");
+  }
+  const { _id } = req.user;
+  const { path: tempUpload, originalname } = req.file;
+
+  const image = await Jimp.read(tempUpload);
+  image.resize(250, 250).write(tempUpload);
+
+  const filename = `${_id}_${originalname}`;
+  const uploadNew = path.join(avatarsPath, filename);
+  await fs.rename(tempUpload, uploadNew);
+  const avatarLink = path.join("avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarLink });
+
+  res.status(200).json({
+    avatarURL: avatarLink,
+  });
+};
+
 module.exports = {
   register: catchAsync(register),
   login: catchAsync(login),
   currentUser: catchAsync(currentUser),
   logout: catchAsync(logout),
+  updateAvatar: catchAsync(updateAvatar),
 };
