@@ -24,12 +24,12 @@ const register = async (req, res) => {
   }
   const hashedPassword = await bcrypt.hash(password, 10);
   const hashedEmail = crypto.createHash("md5").update(email).digest("hex");
-  const avatarLink = gravatar.url(hashedEmail);
+  const avatarURL = gravatar.url(hashedEmail);
 
   const newUser = await User.create({
     ...req.body,
     password: hashedPassword,
-    avatarLink,
+    avatarURL,
   });
 
   res.status(201).json({
