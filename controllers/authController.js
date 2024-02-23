@@ -6,11 +6,13 @@ const path = require("path");
 const fs = require("fs/promises");
 const gravatar = require("gravatar");
 const Jimp = require("jimp");
+const { v4 } = require("uuid");
 
 const { User } = require("../schemas/usersSchemas.js");
 const { catchAsync, HttpError } = require("../helpers");
+const { sendEmail } = require("../services/sendEmail.js");
 
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, BASE_URL } = process.env;
 
 const avatarsPath = path.join(__dirname, "../", "public", "avatars");
 
@@ -24,13 +26,26 @@ const register = async (req, res) => {
   }
   const hashedPassword = await bcrypt.hash(password, 10);
   const hashedEmail = crypto.createHash("md5").update(email).digest("hex");
+
   const avatarURL = gravatar.url(hashedEmail);
+  const verificationToken = v4();
+
 
   const newUser = await User.create({
     ...req.body,
     password: hashedPassword,
     avatarURL,
+    verificationToken,
+
   });
+
+  const verifyEmail = {
+    to: newUser.email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click to verify email</a>`
+  }
+
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
     user: {
@@ -47,6 +62,10 @@ const login = async (req, res) => {
 
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
+  }
+
+  if (!user.verify) {
+    throw HttpError(401, "Email is not verify")
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password);
