@@ -16,10 +16,14 @@
       {
         "name": "Auth",
         "description": "Authorization endpoints"
+      },
+      {
+        "name": "Contacts",
+        "description": "Contacts endpoints"
       }
     ],
     "paths": {
-      "/auth/register": {
+      "/api/users/register": {
         "post": {
           "tags": ["Auth"],
           "summary": "User registration",
@@ -38,7 +42,7 @@
           },
           "responses": {
             "201": {
-              "description": "Successful operation",
+              "description": "Successful",
               "content": {
                 "application/json": {
                   "schema": {
